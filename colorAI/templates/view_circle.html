@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+<!-- style area -->
+{% block css %}
+<style>
+  #circle,#circle2{
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 1px solid black;
+    margin-bottom: 10px;
+    background-color: {{picked}};
+  }
+  #circle{
+    display: none;
+  }
+</style>
+{% endblock css %}
+<!-- style area -->
+
+{% block content %}
+<div
+  class="container d-flex flex-column justify-content-center align-items-center my-4 flex-wrap"
+>
+  <a
+    class="text-decoration-none btn btn-primary btn-sm my-4"
+    href="{{ url_for('create_buttons') }}"
+    >Create Buttons</a
+  >
+
+  <button id="circle2" 
+  >{{Button}}</button>
+  <button id="circle"
+  ></button>
+    
+    
+</div>
+{% if buttons %}
+<div class="container d-flex flex-column justify-content-center align-items-center my-4 flex-wrap">
+  <h2 class="text-center">Select a color:</h2>
+  <div>
+    {% for button in buttons %}
+    <button
+      class="btn m-2"
+      onclick="changeCircleColor('{{ button }}')"
+      style="background-color: {{ button }}"
+    >
+      {{ button }}
+    </button>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<script>
+  function changeCircleColor(color) {
+    document.getElementById("circle").style.display="block";
+    document.getElementById("circle2").style.display="none";
+    document.getElementById("circle").style.backgroundColor = color;
+    document.cookie = "circle_color=" + color;
+  }
+
+  const cookies = document.cookie.split("; ");
+  let color;
+
+  for (const cookie of cookies) {
+    const [name, value] = cookie.split("=");
+    if (name === "circle_color") {
+      color = value;
+      break;
+    }
+  }
+
+  if (color) {
+    document.getElementById("circle").style.backgroundColor = color;
+  }
+</script>
+
+{% endblock content %}

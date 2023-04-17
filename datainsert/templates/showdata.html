@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+
+{% if datas %}
+<div class="container d-flex justify-content-center flex-wrap my-4">
+  <table class="table table-striped">
+    <tr>
+      <td>Name</td>
+      <td>Contact no.</td>
+    </tr>
+    {% for data in datas %}
+    <tr>
+      <td>{{data.name}}</td>
+      <td>{{data.contact}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div style="height: 22rem;">
+    <h1 class="text-center my-4">No data found</h1>
+  </div>
+  {% endif %}
+</div>
+
+<div class="container d-flex justify-content-center flex-wrap">
+    <div class="mt-3">
+      <ul class="pagination">
+        {% if datas.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page=1&{{ params }}">First</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ datas.previous_page_number }}&{{ params }}">Previous</a></li>
+        {% endif %}
+        
+        <li class="page-item active"><a class="page-link" href="">{{ datas.number }}</a></li>
+        
+        {% if datas.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ datas.next_page_number }}&{{ params }}">Next</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{ datas.paginator.num_pages }}&{{ params }}">Last</a></li>
+        {% endif %}
+      </ul>
+    </div>
+</div>
+{% endblock content %}
+    

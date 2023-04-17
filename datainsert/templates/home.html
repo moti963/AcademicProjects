@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="container d-flex flex-column justify-content-center my-4 flex-wrap">
+    <div class="row center">
+        <div class="col-md-6 offset-md-3">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="data-insert">New data</label>
+                    <input type="number" class="form-control" name="data-insert" placeholder="Enter the number of data to insert" required>
+                </div>
+                <button type="submit" class="btn btn-primary my-2">Insert</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

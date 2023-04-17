@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if data %}
+<div class="container d-flex justify-content-center flex-wrap my-4" >
+    <h3 class="text-center text-wrap text-primary">All inserted data</h3>
+  <table class="table table-striped">
+    <tr>
+      <td>Name</td>
+      <td>Contact no.</td>
+    </tr>
+    {% for row in data %}
+    <tr>
+      <td>{{ row[0] }}</td>
+      <td>{{ row[1] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div style="height: 22rem;">
+    <h1 class="text-center my-4">No data found</h1>
+  </div>
+  {% endif %}
+</div>
+
+<div class="container d-flex justify-content-center flex-wrap">
+    <div class="mt-3">
+	<div class="pagination">
+    
+    {% if pages %}
+    <a type="button" class="btn btn-dark m-2" href="/data?page={{ 1 }}">First</a> 
+    {% endif %}
+    
+		{% if page > 1 %}
+    <a type="button" class="btn btn-primary m-2" href="/data?page={{ page - 1 }}">Previous</a>
+		{% endif %}
+		{% if page < pages %}
+    <a type="button" class="btn btn-secondary m-2" href="/data?page={{ page + 1 }}">Next</a>
+		{% endif %}
+
+    {% if pages %}
+    <a type="button" class="btn btn-warning m-2" href="/data?page={{ pages }}">Last</a> 
+    {% endif %}
+	</div>
+    </div>
+</div>
+
+    
+{% endblock content %}
+    

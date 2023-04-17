@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        /* CSS styles for the grid */
+        table {
+            border-collapse: collapse;
+        }
+
+        td {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            border: 1px solid black;
+            font-size: 20px;
+        }
+
+        .start {
+            background-color: green;
+        }
+
+        .end {
+            background-color: red;
+        }
+
+        .obstacle {
+            background-color: gray;
+        }
+
+        .path {
+            background-color: blue;
+        }
+
+        .mouse {
+            background-color: yellow;
+        }
+    </style>
+</head>
+
+<body>
+
+    <label>rows</label>
+    <input name="rows" id="rows" type="number" />
+    <label>column</label>
+    <input name="column" id="column" type="number" />
+    <label>start</label>
+    <input name="startx" id="startx" type="number" />
+    <input name="starty" id="starty" type="number" />
+    <label>end</label>
+    <input name="endx" id="endx" type="number" />
+    <input name="endy" id="endy" type="number" />
+    <button onclick="generate()">Generate</button>
+    <button onclick="path()">find path</button>
+    <button onclick="exp()">Explore</button>
+    <table id="grid"></table>
+    <script>
+        let obstacle = [];
+        const grid = document.getElementById('grid');
+        grid.addEventListener('click', (e) => {
+            // Retrieve id from clicked element
+            let elementId = e.target.id;
+            // If element has id
+            if (elementId !== '') {
+                // console.log(elementId.split('-'));
+
+                obstacle.push({ x: parseInt(elementId.split('-')[0]), y: parseInt(elementId.split('-')[1]) });
+                document.getElementById(elementId).classList.add('obstacle');
+            }
+            // If element has no id
+            else {
+                console.log("An element without an id was clicked.");
+            }
+        }
+        );
+        // Define the grid size, start point, end point, and obstacles
+        function generate() {
+            const gridSize = { rows: document.getElementById("rows").value, cols: document.getElementById("column").value };
+            const start = { x: document.getElementById("startx").value, y: document.getElementById("starty").value };
+            const end = { x: document.getElementById("endx").value, y: document.getElementById("endy").value };
+            const grid = document.getElementById('grid');
+            grid.innerHTML = "";
+            let currentX = start.x;
+            let currentY = start.y;
+
+            // Create the grid table dynamically
+            for (let i = 0; i < gridSize.rows; i++) {
+                const row = document.createElement('tr');
+                for (let j = 0; j < gridSize.cols; j++) {
+                    const cell = document.createElement('td');
+                    const cellId = i + '-' + j;
+                    cell.setAttribute('id', cellId);
+                    row.appendChild(cell);
+                }
+                grid.appendChild(row);
+            }
+
+            // Set the start and end points on the grid
+            document.getElementById(`${start.x}-${start.y}`).classList.add('start');
+            document.getElementById(`${end.x}-${end.y}`).classList.add('end');
+        }
+
+        // Set the obstacle points on the grid
+
+
+        // Add event listener for mouse movement
+
+        // grid.addEventListener('mouseover', function (event) {
+        //     // Remove previous mouse position
+        //     console.log(event)
+        //     document.getElementById(`${currentX}-${currentY}`).classList.remove('mouse');
+
+        //     // Update current mouse position
+        //     currentX = Math.floor(event.clientY / 50);
+        //     currentY = Math.floor(event.clientX / 50);
+
+        //     // Add current mouse position to grid
+        //     document.getElementById(`${currentX}-${currentY}`).classList.add('mouse');
+        // });
+
+        // Add event listener for mouse click to find path
+        function path() {
+            // Clear previous path
+            const path = document.getElementsByClassName('path');
+            while (path.length > 0) {
+                path[0].classList.remove('path');
+            }
+            const start = { x: parseInt(document.getElementById("startx").value), y: parseInt(document.getElementById("starty").value) };
+            const end = { x: parseInt(document.getElementById("endx").value), y: parseInt(document.getElementById("endy").value) };
+            console.log(obstacle);
+            const pathFound = findPath(start, end, obstacle);
+            if (pathFound.length > 0) {
+                for (const point of pathFound) {
+                    document.getElementById(`${point.x}-${point.y}`).classList.add('path');
+                }
+            } else {
+                alert('No valid path found from the current mouse position to the end point!');
+            }
+        }
+        function findPath(start, end, obstacles) {
+            const queue = [];
+            const visited = new Set();
+            const parent = new Map();
+
+            queue.push(start);
+            visited.add(`${start.x}-${start.y}`);
+
+            while (queue.length > 0) {
+                const current = queue.shift();
+                if (current.x === end.x && current.y === end.y) {
+                    return reconstructPath(parent, current);
+                }
+                const neighbors = generateNeighbors(current, obstacles, visited);
+
+                for (const neighbor of neighbors) {
+                    parent.set(`${neighbor.x}-${neighbor.y}`, current);
+                    visited.add(`${neighbor.x}-${neighbor.y}`);
+                    queue.push(neighbor);
+                }
+            }
+
+            return [];
+        }
+        // // CCCCCCCCCCCCCCCCCCCCCCCC@@@@@@@@@@@
+        // function findPathDup(start, end, obstacles) {
+        //     const queue = [];
+        //     const visited = new Set();
+        //     const parent = new Map();
+
+        //     queue.push(start);
+        //     visited.add(`${start.x}-${start.y}`);
+
+        //     while (queue.length > 0) {
+        //         const current = queue.shift();
+
+        //         // Check if the current point is the end point
+        //         if (current.x === end.x && current.y === end.y) {
+        //             return reconstructPath(parent, current);
+        //         }
+
+        //         const neighbors = generateNeighbors(current, obstacles, visited);
+
+        //         for (const neighbor of neighbors) {
+        //             // Update the parent map with the current point as the parent of its neighbor
+        //             parent.set(`${neighbor.x}-${neighbor.y}`, current);
+        //             visited.add(`${neighbor.x}-${neighbor.y}`);
+        //             queue.push(neighbor);
+        //         }
+        //     }
+
+        //     // No path found
+        //     return [];
+        // }
+        function exp() {
+            console.log("Clicked exp");
+            const gridSize = { rows: document.getElementById("rows").value, cols: document.getElementById("column").value };
+            const end = { x: document.getElementById("endx").value, y: document.getElementById("endy").value };
+            explore(end, obstacle, gridSize);
+
+        }
+        function explore(end, obstacles, gridSize) {
+            const queue = [];
+            const visited = new Set();
+            let distance = 0;
+
+            queue.push(end);
+            visited.add(`${end.x}-${end.y}`);
+
+            while (queue.length > 0) {
+                const size = queue.length;
+                for (let i = 0; i < size; i++) {
+                    const current = queue.shift();
+                    // document.getElementById(`${current.x}-${current.y}`).innerText = distance;
+                    const element = document.getElementById(`${current.x}-${current.y}`);
+                    if (element) {
+                        element.innerText = distance;
+                    }
+                    const neighbors = generateNeighbors(current, obstacles, visited, gridSize);
+
+                    for (const neighbor of neighbors) {
+                        queue.push(neighbor);
+                        visited.add(`${neighbor.x}-${neighbor.y}`);
+                    }
+                }
+                distance++;
+            }
+        }
+
+
+
+        // // ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,@@@@@@@@@@@@@@@@
+        function generateNeighbors(point, obstacles, visited) {
+            const gridSize = { rows: document.getElementById("rows").value, cols: document.getElementById("column").value };
+            const neighbors = [];
+            const directions = [
+                { x: -1, y: 0 },
+                { x: 1, y: 0 },
+                { x: 0, y: -1 },
+                { x: 0, y: 1 }
+            ];
+
+            for (const direction of directions) {
+                const neighborX = point.x + direction.x;
+                const neighborY = point.y + direction.y;
+                if (neighborX >= 0 && neighborX < gridSize.rows && neighborY >= 0 && neighborY < gridSize.cols) {
+                    const neighbor = { x: neighborX, y: neighborY };
+                    if (!isObstacle(neighbor, obstacles) && !visited.has(`${neighbor.x}-${neighbor.y}`)) {
+                        neighbors.push(neighbor);
+                    }
+                }
+            }
+
+            return neighbors;
+        }
+
+        // Function to check if a point is an obstacle
+        function isObstacle(point, obstacles) {
+            for (const obstacle of obstacles) {
+                if (point.x === obstacle.x && point.y === obstacle.y) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Function to reconstruct the path from end to start point
+        function reconstructPath(parent, current) {
+            const path = [];
+            while (current) {
+                path.push(current);
+                current = parent.get(`${current.x}-${current.y}`);
+            }
+            path.reverse();
+            return path;
+        }
+    </script>
+</body>
+
+</html>
